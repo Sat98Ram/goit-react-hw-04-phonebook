@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Phonebook from './Phonebook/Phonebook';
 import Section from './Sectiion/Section';
 import Contacts from './Contacts/Contacts';
@@ -7,25 +7,45 @@ import Filter from './Filter/Filter';
 const LOCAL_STORAGE_CONTACTS_KEY = 'contacts';
 
 export const App = () => {
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState(() =>
+    JSON.parse(window.localStorage.getItem('contacts') ?? [])
+  );
   const [filter, setFilter] = useState('');
 
+  useEffect(() => {
+    window.localStorage.setItem('contacts', JSON.stringify(contacts));
+  });
+
   const addContact = contact => {
-    //    const isExist = this.state.contacts.some(
-    //      el => el.name.toLowerCase() === name.toLowerCase() || el.number === number
-    //   );
-    // if (isExist(contact.name)) {
-    //   alert(`contact already exist`);
-    //   return;
-    // }
     const { name } = contact;
-
-    const isExist = contacts.some(
-      contact => contact.name.toLowerCase() === name.toLowerCase()
-    );
-
+    const isExist = name =>
+      contacts.some(
+        contact => contact.name.toLowerCase() === name.toLowerCase()
+      );
+    if (isExist(name)) {
+      alert(`contact already exist`);
+      return;
+    }
     setContacts([...contacts, contact]);
     localStorage.setItem(LOCAL_STORAGE_CONTACTS_KEY, JSON.stringify(contacts));
+  };
+
+  const searchFilter = ev => {
+    const { value } = ev.target;
+    setFilter(value);
+  };
+
+  const filterContacts = ev => {
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
+    );
+  };
+
+  const filteredContacts = filterContacts();
+
+  const deleteContact = id => {
+    setContacts(contacts.filter(contact => contact.id !== id));
+    // localStorage.setItem(LOCAL_STORAGE_CONTACTS_KEY, JSON.stringify(contacts));
   };
 
   return (
@@ -43,31 +63,13 @@ export const App = () => {
       <Section title="Phonebook">
         <Phonebook onSubmit={addContact} />
       </Section>
-      {/* <Section title="Contacts">
-        <Filter filter={this.state.filter} onChange={this.searchFilter} />
-        <Contacts
-          contacts={filteredContacts}
-          deleteContact={this.deleteContact}
-        />
-      </Section> */}
+      <Section title="Contacts">
+        <Filter filter={filter} onChange={searchFilter} />{' '}
+        <Contacts contacts={filteredContacts} deleteContact={deleteContact} />
+      </Section>
     </div>
   );
 };
-
-// export class App extends Component {
-//   state = {
-//     contacts: [],
-//     filter: '',
-//   };
-
-//   componentDidMount() {
-//     const localContacts = JSON.parse(
-//       localStorage.getItem(LOCAL_STORAGE_CONTACTS_KEY)
-//     );
-//     if (localContacts) {
-//       this.setState({ contacts: localContacts });
-//     }
-//   }
 
 //   componentDidUpdate(prevProps, prevState) {
 //     if (prevState.contacts.length !== this.state.contacts.length) {
@@ -77,67 +79,3 @@ export const App = () => {
 //       );
 //     }
 //   }
-
-//   addContact = data => {
-//     const { name, number } = data;
-
-//     const isExist = this.state.contacts.some(
-//       el => el.name.toLowerCase() === name.toLowerCase() || el.number === number
-//     );
-//     if (isExist) {
-//       alert(`contact already exist`);
-//       return;
-//     }
-
-//     this.setState(prevState => ({
-//       contacts: [...prevState.contacts, data],
-//     }));
-//   };
-
-//   // checkContacts = () => {}
-
-//   searchFilter = ev => {
-//     this.setState({ filter: ev.target.value });
-//   };
-
-//   deleteContact = id => {
-//     this.setState(prevState => ({
-//       contacts: prevState.contacts.filter(contact => contact.id !== id),
-//     }));
-//   };
-
-//   filteredContacts = ev => {
-//     return this.state.contacts.filter(contact =>
-//       contact.name.toLowerCase().includes(this.state.filter.toLowerCase())
-//     );
-//   };
-
-//   render() {
-//     const filteredContacts = this.filteredContacts();
-//     // const { contacts, name } = this.state;
-//     return (
-//       <div
-//         style={{
-//           // height: '100vh',
-//           display: 'flex',
-//           flexDirection: 'column',
-//           justifyContent: 'center',
-//           alignItems: 'center',
-//           fontSize: 40,
-//           color: '#010101',
-//         }}
-//       >
-//         <Section title="Phonebook">
-//           <Phonebook onSubmit={this.addContact} />
-//         </Section>
-//         <Section title="Contacts">
-//           <Filter filter={this.state.filter} onChange={this.searchFilter} />
-//           <Contacts
-//             contacts={filteredContacts}
-//             deleteContact={this.deleteContact}
-//           />
-//         </Section>
-//       </div>
-//     );
-//   }
-// }
