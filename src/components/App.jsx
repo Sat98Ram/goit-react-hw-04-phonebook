@@ -4,17 +4,15 @@ import Section from './Sectiion/Section';
 import Contacts from './Contacts/Contacts';
 import Filter from './Filter/Filter';
 
-const LOCAL_STORAGE_CONTACTS_KEY = 'contacts';
-
 export const App = () => {
-  const [contacts, setContacts] = useState(() =>
-    JSON.parse(window.localStorage.getItem('contacts') ?? [])
+  const [contacts, setContacts] = useState(
+    () => JSON.parse(localStorage.getItem('contacts')) || []
   );
   const [filter, setFilter] = useState('');
 
   useEffect(() => {
-    window.localStorage.setItem('contacts', JSON.stringify(contacts));
-  });
+    localStorage.setItem('contacts', JSON.stringify(contacts));
+  }, [contacts]);
 
   const addContact = contact => {
     const { name } = contact;
@@ -27,7 +25,6 @@ export const App = () => {
       return;
     }
     setContacts([...contacts, contact]);
-    localStorage.setItem(LOCAL_STORAGE_CONTACTS_KEY, JSON.stringify(contacts));
   };
 
   const searchFilter = ev => {
@@ -45,7 +42,6 @@ export const App = () => {
 
   const deleteContact = id => {
     setContacts(contacts.filter(contact => contact.id !== id));
-    // localStorage.setItem(LOCAL_STORAGE_CONTACTS_KEY, JSON.stringify(contacts));
   };
 
   return (
@@ -70,12 +66,3 @@ export const App = () => {
     </div>
   );
 };
-
-//   componentDidUpdate(prevProps, prevState) {
-//     if (prevState.contacts.length !== this.state.contacts.length) {
-//       localStorage.setItem(
-//         LOCAL_STORAGE_CONTACTS_KEY,
-//         JSON.stringify(this.state.contacts)
-//       );
-//     }
-//   }
