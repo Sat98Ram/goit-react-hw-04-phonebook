@@ -1,4 +1,4 @@
-import { Component } from 'react';
+import { useState } from 'react';
 import Phonebook from './Phonebook/Phonebook';
 import Section from './Sectiion/Section';
 import Contacts from './Contacts/Contacts';
@@ -6,90 +6,138 @@ import Filter from './Filter/Filter';
 
 const LOCAL_STORAGE_CONTACTS_KEY = 'contacts';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
-  };
+export const App = () => {
+  const [contacts, setContacts] = useState([]);
+  const [filter, setFilter] = useState('');
 
-  componentDidMount() {
-    const localContacts = JSON.parse(
-      localStorage.getItem(LOCAL_STORAGE_CONTACTS_KEY)
+  const addContact = contact => {
+    //    const isExist = this.state.contacts.some(
+    //      el => el.name.toLowerCase() === name.toLowerCase() || el.number === number
+    //   );
+    // if (isExist(contact.name)) {
+    //   alert(`contact already exist`);
+    //   return;
+    // }
+    const { name } = contact;
+
+    const isExist = contacts.some(
+      contact => contact.name.toLowerCase() === name.toLowerCase()
     );
-    if (localContacts) {
-      this.setState({ contacts: localContacts });
-    }
-  }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.contacts.length !== this.state.contacts.length) {
-      localStorage.setItem(
-        LOCAL_STORAGE_CONTACTS_KEY,
-        JSON.stringify(this.state.contacts)
-      );
-    }
-  }
-
-  addContact = data => {
-    const { name, number } = data;
-
-    const isExist = this.state.contacts.some(
-      el => el.name.toLowerCase() === name.toLowerCase() || el.number === number
-    );
-    if (isExist) {
-      alert(`contact already exist`);
-      return;
-    }
-
-    this.setState(prevState => ({
-      contacts: [...prevState.contacts, data],
-    }));
+    setContacts([...contacts, contact]);
+    localStorage.setItem(LOCAL_STORAGE_CONTACTS_KEY, JSON.stringify(contacts));
   };
 
-  // checkContacts = () => {}
+  return (
+    <div
+      style={{
+        height: '100vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        fontSize: 40,
+        color: '#010101',
+      }}
+    >
+      <Section title="Phonebook">
+        <Phonebook onSubmit={addContact} />
+      </Section>
+      {/* <Section title="Contacts">
+        <Filter filter={this.state.filter} onChange={this.searchFilter} />
+        <Contacts
+          contacts={filteredContacts}
+          deleteContact={this.deleteContact}
+        />
+      </Section> */}
+    </div>
+  );
+};
 
-  searchFilter = ev => {
-    this.setState({ filter: ev.target.value });
-  };
+// export class App extends Component {
+//   state = {
+//     contacts: [],
+//     filter: '',
+//   };
 
-  deleteContact = id => {
-    this.setState(prevState => ({
-      contacts: prevState.contacts.filter(contact => contact.id !== id),
-    }));
-  };
+//   componentDidMount() {
+//     const localContacts = JSON.parse(
+//       localStorage.getItem(LOCAL_STORAGE_CONTACTS_KEY)
+//     );
+//     if (localContacts) {
+//       this.setState({ contacts: localContacts });
+//     }
+//   }
 
-  filteredContacts = ev => {
-    return this.state.contacts.filter(contact =>
-      contact.name.toLowerCase().includes(this.state.filter.toLowerCase())
-    );
-  };
+//   componentDidUpdate(prevProps, prevState) {
+//     if (prevState.contacts.length !== this.state.contacts.length) {
+//       localStorage.setItem(
+//         LOCAL_STORAGE_CONTACTS_KEY,
+//         JSON.stringify(this.state.contacts)
+//       );
+//     }
+//   }
 
-  render() {
-    const filteredContacts = this.filteredContacts();
-    // const { contacts, name } = this.state;
-    return (
-      <div
-        style={{
-          // height: '100vh',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          fontSize: 40,
-          color: '#010101',
-        }}
-      >
-        <Section title="Phonebook">
-          <Phonebook onSubmit={this.addContact} />
-        </Section>
-        <Section title="Contacts">
-          <Filter filter={this.state.filter} onChange={this.searchFilter} />
-          <Contacts
-            contacts={filteredContacts}
-            deleteContact={this.deleteContact}
-          />
-        </Section>
-      </div>
-    );
-  }
-}
+//   addContact = data => {
+//     const { name, number } = data;
+
+//     const isExist = this.state.contacts.some(
+//       el => el.name.toLowerCase() === name.toLowerCase() || el.number === number
+//     );
+//     if (isExist) {
+//       alert(`contact already exist`);
+//       return;
+//     }
+
+//     this.setState(prevState => ({
+//       contacts: [...prevState.contacts, data],
+//     }));
+//   };
+
+//   // checkContacts = () => {}
+
+//   searchFilter = ev => {
+//     this.setState({ filter: ev.target.value });
+//   };
+
+//   deleteContact = id => {
+//     this.setState(prevState => ({
+//       contacts: prevState.contacts.filter(contact => contact.id !== id),
+//     }));
+//   };
+
+//   filteredContacts = ev => {
+//     return this.state.contacts.filter(contact =>
+//       contact.name.toLowerCase().includes(this.state.filter.toLowerCase())
+//     );
+//   };
+
+//   render() {
+//     const filteredContacts = this.filteredContacts();
+//     // const { contacts, name } = this.state;
+//     return (
+//       <div
+//         style={{
+//           // height: '100vh',
+//           display: 'flex',
+//           flexDirection: 'column',
+//           justifyContent: 'center',
+//           alignItems: 'center',
+//           fontSize: 40,
+//           color: '#010101',
+//         }}
+//       >
+//         <Section title="Phonebook">
+//           <Phonebook onSubmit={this.addContact} />
+//         </Section>
+//         <Section title="Contacts">
+//           <Filter filter={this.state.filter} onChange={this.searchFilter} />
+//           <Contacts
+//             contacts={filteredContacts}
+//             deleteContact={this.deleteContact}
+//           />
+//         </Section>
+//       </div>
+//     );
+//   }
+// }
